@@ -44,7 +44,7 @@ export async function Footer() {
                 <Instagram size={18} />
               </Link>
               <Link
-                href="#"
+                href="https://www.facebook.com/share/18jd899x2M/"
                 className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-surface transition hover:border-primary hover:bg-primary/10 hover:text-white"
               >
                 <Facebook size={18} />
