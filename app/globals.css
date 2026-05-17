@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root{--background:#050505;--surface:#111111;--primary:#D61F1F;--accent:#FF3B3B;--foreground:#F5F5F5;--muted:#A1A1AA}
+*{border-color:rgba(255,255,255,.08)} html[data-scroll-behavior="smooth"]{scroll-behavior:smooth} body{background:#050505;color:#f5f5f5;overflow-x:hidden} .manga-lines{background-image:repeating-linear-gradient(110deg, rgba(255,255,255,.05) 0 1px, transparent 1px 12px)}
