@@ -117,7 +117,7 @@ export async function Footer() {
         <div className="mt-8 border-t border-white/5 pt-5 md:mt-14 md:pt-8">
           <div className="flex flex-col items-center justify-between gap-3 md:flex-row md:gap-4">
             <p className="text-center text-[10px] uppercase tracking-[0.25em] text-zinc-500 md:text-xs md:tracking-[0.3em]">
-              © {currentYear} T-KAI Studio. Tous les droits réservés.
+              © {currentYear} <Link href="/admin" className="transition hover:text-white">T-KAI Studio</Link>. Tous les droits réservés.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] uppercase tracking-wider text-zinc-500 md:gap-6 md:text-xs">
@@ -132,9 +132,6 @@ export async function Footer() {
               </Link>
               <Link href="/track" className="transition hover:text-white">
                 Mes commandes
-              </Link>
-              <Link href="/admin" className="transition hover:text-white">
-                Admin
               </Link>
             </div>
           </div>
