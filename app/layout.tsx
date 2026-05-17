@@ -14,6 +14,12 @@ export const metadata: Metadata = {
   },
 };
 
+// Empêche le pré-rendu statique au build time : on a un layout qui appelle
+// Prisma (Footer → catégories), donc on a besoin que ce soit fait à la requête.
+// Sans ça, Vercel essaie de pré-rendre 20 pages au build et plante si la DB
+// n'est pas joignable.
+export const dynamic = "force-dynamic";
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
