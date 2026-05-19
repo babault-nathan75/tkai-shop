@@ -135,7 +135,7 @@ export default async function AdminOrdersPage() {
 
           {orders.length === 0 && (
             <div className="rounded-3xl border border-white/10 bg-surface px-6 py-16 text-center text-zinc-500">
-              Aucune commande disponible.
+              Aucune commande passée.
             </div>
           )}
         </div>
