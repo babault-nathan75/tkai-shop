@@ -109,6 +109,9 @@ export async function Footer() {
                 <p className="mt-1 break-all text-sm font-bold text-white md:mt-2 md:text-base">
                   tkaishop26@gmail.com
                 </p>
+                <p className="mt-1 break-all text-sm font-bold text-white md:mt-2 md:text-base">
+                  +225 05 00 90 34 33
+                </p>
               </div>
             </div>
           </div>
