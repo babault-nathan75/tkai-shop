@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import { ProductCard } from "@/components/ProductCard";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 interface ShopPageProps {
   searchParams: Promise<{

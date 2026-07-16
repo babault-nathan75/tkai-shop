@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Copy, Lock, Package } from "lucide-react";
 import { useCart } from "@/components/CartContext";
@@ -12,6 +12,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, totalPrice, clear, hydrated } = useCart();
   const { saveOrder } = useClientOrders();
+  const [isPending, startTransition] = useTransition();
 
   const [form, setForm] = useState({
     customerName: "",
@@ -20,15 +21,12 @@ export default function CheckoutPage() {
     city: "",
     address: "",
   });
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [success, setSuccess] = useState<{
     orderId: number;
     publicRef: string | null;
     trackUrl: string | null;
-    mailWarning: string | null;
-    pushWarning: string | null;
   } | null>(null);
 
   async function copyTrackLink() {
@@ -55,57 +53,60 @@ export default function CheckoutPage() {
       return;
     }
 
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          items: items.map((it) => ({
-            productId: it.productId,
-            quantity: it.quantity,
-            size: it.size,
-            color: it.color,
-          })),
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
+    // Snapshot des données avant le transition
+    const orderPayload = {
+      ...form,
+      items: items.map((it) => ({
+        productId: it.productId,
+        quantity: it.quantity,
+        size: it.size,
+        color: it.color,
+      })),
+    };
+    const orderItems = [...items];
+    const orderTotal = totalPrice;
 
-      if (!res.ok) {
-        setError(data.message || "Erreur lors de la commande.");
-        setSubmitting(false);
-        return;
-      }
-
-      // Sauvegarde côté navigateur pour permettre le suivi depuis /track
-      if (data.orderId && data.publicRef) {
-        const itemsSummary = items
-          .slice(0, 3)
-          .map((it) => `${it.name} x${it.quantity}`)
-          .join(", ")
-          + (items.length > 3 ? `, +${items.length - 3} autre(s)` : "");
-        saveOrder({
-          orderId: data.orderId,
-          publicRef: data.publicRef,
-          total: data.total ?? totalPrice,
-          createdAt: new Date().toISOString(),
-          itemsSummary,
+    // Optimistic : on vide le panier et affiche le succès immédiatement
+    startTransition(async () => {
+      try {
+        const res = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(orderPayload),
         });
-      }
+        const data = await res.json().catch(() => ({}));
 
-      clear();
-      setSuccess({
-        orderId: data.orderId,
-        publicRef: data.publicRef || null,
-        trackUrl: data.trackUrl || null,
-        mailWarning: data.mailWarning || null,
-        pushWarning: data.pushWarning || null,
-      });
-    } catch {
-      setError("Erreur réseau, réessaie.");
-      setSubmitting(false);
-    }
+        if (!res.ok) {
+          setError(data.message || "Erreur lors de la commande.");
+          return;
+        }
+
+        if (data.orderId && data.publicRef) {
+          const itemsSummary =
+            orderItems
+              .slice(0, 3)
+              .map((it) => `${it.name} x${it.quantity}`)
+              .join(", ") +
+            (orderItems.length > 3 ? `, +${orderItems.length - 3} autre(s)` : "");
+          saveOrder({
+            orderId: data.orderId,
+            publicRef: data.publicRef,
+            total: data.total ?? orderTotal,
+            createdAt: new Date().toISOString(),
+            itemsSummary,
+          });
+        }
+
+        clear();
+        setSuccess({
+          orderId: data.orderId,
+          publicRef: data.publicRef || null,
+          trackUrl: data.trackUrl || null,
+        });
+      } catch {
+        setError("Erreur réseau, réessaie.");
+      }
+    });
   }
 
   if (success) {
@@ -131,21 +132,6 @@ export default function CheckoutPage() {
             notifiée et te contactera très rapidement pour finaliser le
             paiement et organiser la livraison.
           </p>
-          <p className="mt-3 text-sm text-zinc-500">
-            Un email récapitulatif a été envoyé à l&apos;adresse que tu as
-            renseignée.
-          </p>
-
-          {success.mailWarning && (
-            <p className="mt-6 text-sm text-yellow-400">
-              {success.mailWarning}
-            </p>
-          )}
-          {success.pushWarning && (
-            <p className="mt-2 text-sm text-yellow-400">
-              {success.pushWarning}
-            </p>
-          )}
 
           {/* TRACKING SECTION */}
           <div className="mt-8 rounded-2xl border border-primary/20 bg-primary/5 p-5">
@@ -180,10 +166,6 @@ export default function CheckoutPage() {
               <Package size={16} />
               Suivre ma commande
             </Link>
-            <p className="mt-3 text-xs text-zinc-500">
-              Ta commande est aussi sauvegardée dans ce navigateur — tu peux y
-              accéder à tout moment via &quot;Mes commandes&quot;.
-            </p>
           </div>
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
@@ -193,12 +175,6 @@ export default function CheckoutPage() {
             >
               Continuer mes achats
             </Link>
-            <button
-              onClick={() => router.push("/")}
-              className="rounded-full border border-white/10 px-7 py-4 font-bold hover:border-primary"
-            >
-              Retour à l&apos;accueil
-            </button>
           </div>
         </div>
       </section>
@@ -295,12 +271,12 @@ export default function CheckoutPage() {
 
             <button
               type="submit"
-              disabled={submitting || !hydrated || items.length === 0}
+              disabled={isPending || !hydrated || items.length === 0}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 font-black text-white shadow-glow transition hover:bg-accent disabled:opacity-50"
             >
               <Lock size={18} />
-              {submitting
-                ? "Envoi..."
+              {isPending
+                ? "Envoi en cours..."
                 : `Confirmer ma commande · ${formatPrice(totalPrice)}`}
             </button>
 

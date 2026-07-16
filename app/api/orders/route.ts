@@ -27,9 +27,6 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// Renvoie l'URL de base du site (pour construire les liens dans les emails/notifs).
-// 1. PUBLIC_BASE_URL si défini dans .env
-// 2. Sinon déduit du host de la requête + protocole
 function getBaseUrl(request: Request): string {
   const envUrl = process.env.PUBLIC_BASE_URL;
   if (envUrl) return envUrl.replace(/\/$/, "");
@@ -113,7 +110,7 @@ export async function POST(request: Request) {
   }
 
   const total = lines.reduce((s, l) => s + l.price * l.quantity, 0);
-  const publicRef = randomBytes(12).toString("hex"); // 24 chars
+  const publicRef = randomBytes(12).toString("hex");
 
   const order = await prisma.order.create({
     data: {
@@ -142,10 +139,6 @@ export async function POST(request: Request) {
   const trackUrl = `${baseUrl}/track/${publicRef}`;
   const adminUrl = `${baseUrl}/admin/orders/${order.id}`;
 
-  // Notifications email + push admin
-  let mailWarning: string | null = null;
-  let pushWarning: string | null = null;
-
   const emailItems = order.items.map((it) => ({
     name: it.product.name,
     quantity: it.quantity,
@@ -154,7 +147,10 @@ export async function POST(request: Request) {
     color: it.color,
   }));
 
-  const [mailResult, pushResult] = await Promise.allSettled([
+  // ── Fire-and-forget : emails + push notifications ──
+  // On ne bloque PAS la réponse HTTP pour ces opérations.
+  // Les erreurs sont logguées silencieusement.
+  Promise.allSettled([
     sendOrderEmails({
       id: order.id,
       publicRef: order.publicRef,
@@ -183,24 +179,7 @@ export async function POST(request: Request) {
         adminUrl,
       })
     ),
-  ]);
-
-  if (mailResult.status === "rejected") {
-    const reason =
-      mailResult.reason instanceof Error
-        ? mailResult.reason.message
-        : String(mailResult.reason);
-    console.error("[orders] échec envoi mail :", reason);
-    mailWarning = `Mail non envoyé : ${reason}`;
-  }
-  if (pushResult.status === "rejected") {
-    const reason =
-      pushResult.reason instanceof Error
-        ? pushResult.reason.message
-        : String(pushResult.reason);
-    console.error("[orders] échec ntfy :", reason);
-    pushWarning = `Notification push non envoyée : ${reason}`;
-  }
+  ]).catch(() => {});
 
   return NextResponse.json(
     {
@@ -209,8 +188,6 @@ export async function POST(request: Request) {
       publicRef: order.publicRef,
       trackUrl,
       total: order.total,
-      mailWarning,
-      pushWarning,
     },
     { status: 201 }
   );

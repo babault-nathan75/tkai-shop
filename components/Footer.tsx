@@ -1,20 +1,25 @@
 import Link from "next/link";
 import { Facebook, Instagram } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 
-async function fetchCategories() {
-  try {
-    return await prisma.category.findMany({
-      orderBy: { createdAt: "asc" },
-    });
-  } catch {
-    return [];
-  }
-}
+const getCachedCategories = unstable_cache(
+  async () => {
+    try {
+      return await prisma.category.findMany({
+        orderBy: { createdAt: "asc" },
+      });
+    } catch {
+      return [];
+    }
+  },
+  ["footer-categories"],
+  { revalidate: 300, tags: ["categories"] }
+);
 
 export async function Footer() {
   const currentYear = new Date().getFullYear();
-  const categories = await fetchCategories();
+  const categories = await getCachedCategories();
 
   return (
     <footer className="relative overflow-hidden border-t border-white/10 bg-black text-zinc-400">

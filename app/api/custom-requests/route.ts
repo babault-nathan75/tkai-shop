@@ -16,9 +16,12 @@ export async function POST(request: Request) {
     email?: string;
     phone?: string;
     text?: string;
+    fontFamily?: string;
     color?: string;
+    product?: string;
     notes?: string;
     imageUrl?: string;
+    imageCount?: number;
   };
   try {
     body = await request.json();
@@ -30,7 +33,9 @@ export async function POST(request: Request) {
   const email = String(body.email || "").trim().toLowerCase();
   const phone = body.phone ? String(body.phone).trim() : "";
   const text = body.text ? String(body.text).trim() : "";
+  const fontFamily = body.fontFamily ? String(body.fontFamily).trim() : "";
   const color = body.color ? String(body.color).trim() : "";
+  const product = body.product ? String(body.product).trim() : "";
   const notes = body.notes ? String(body.notes).trim() : "";
   const imageUrl = body.imageUrl ? String(body.imageUrl).trim() : "";
 
@@ -53,17 +58,24 @@ export async function POST(request: Request) {
     },
   });
 
-  let mailWarning: string | null = null;
-  let pushWarning: string | null = null;
+  const fullNotes = [
+    notes,
+    product ? `Produit: ${product}` : null,
+    fontFamily ? `Police: ${fontFamily}` : null,
+    body.imageCount ? `${body.imageCount} image(s) uploadée(s)` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
 
-  const [mailResult, pushResult] = await Promise.allSettled([
+  // ── Fire-and-forget : emails + push notifications ──
+  Promise.allSettled([
     sendCustomRequestEmails({
       customerName,
       email,
       phone,
       text,
       color,
-      notes,
+      notes: fullNotes,
       imageUrl,
     }),
     sendAdminNotification(
@@ -73,24 +85,13 @@ export async function POST(request: Request) {
         phone,
         text,
         color,
-        notes,
+        notes: fullNotes,
       })
     ),
-  ]);
-
-  if (mailResult.status === "rejected") {
-    console.error("Erreur envoi email custom-lab:", mailResult.reason);
-    mailWarning =
-      "Demande enregistrée, mais l'envoi du mail a échoué (config SMTP).";
-  }
-  if (pushResult.status === "rejected") {
-    console.error("Erreur notification ntfy custom-lab:", pushResult.reason);
-    pushWarning =
-      "Notification push admin non envoyée (vérifie NTFY_TOPIC).";
-  }
+  ]).catch(() => {});
 
   return NextResponse.json(
-    { success: true, mailWarning, pushWarning },
+    { success: true },
     { status: 201 }
   );
 }

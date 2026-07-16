@@ -13,6 +13,25 @@ function getSecret(): string {
   return secret;
 }
 
+// ── Cached CryptoKey (imported once, reused for all sign/verify) ──
+
+let cachedKey: CryptoKey | null = null;
+let cachedSecret: string | null = null;
+
+async function getKey(): Promise<CryptoKey> {
+  const secret = getSecret();
+  if (cachedKey && cachedSecret === secret) return cachedKey;
+  cachedKey = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"]
+  );
+  cachedSecret = secret;
+  return cachedKey;
+}
+
 function base64urlEncode(bytes: Uint8Array): string {
   let bin = "";
   for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
@@ -29,15 +48,12 @@ function base64urlDecode(str: string): Uint8Array {
 }
 
 async function hmacSign(payload: string): Promise<string> {
-  const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(getSecret()),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
+  const key = await getKey();
+  const sig = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(payload)
   );
-  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(payload));
   return base64urlEncode(new Uint8Array(sig));
 }
 
