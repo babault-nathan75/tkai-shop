@@ -169,6 +169,7 @@ interface ClothingMockupProps {
   text: string;
   textColor: string;
   fontFamily: string;
+  textScale: number;
   images: MockupImage[];
   onImageUpdate: (id: string, x: number, y: number, size: number) => void;
   textX: number;
@@ -182,6 +183,7 @@ export function ClothingMockup({
   text,
   textColor,
   fontFamily,
+  textScale,
   images,
   onImageUpdate,
   textX,
@@ -269,10 +271,12 @@ export function ClothingMockup({
 
   const fontSize = useMemo(() => {
     const len = text.trim().length;
-    if (len > 18) return vb.w * 0.055;
-    if (len > 12) return vb.w * 0.065;
-    return vb.w * 0.08;
-  }, [text, vb.w]);
+    let base: number;
+    if (len > 18) base = vb.w * 0.055;
+    else if (len > 12) base = vb.w * 0.065;
+    else base = vb.w * 0.08;
+    return base * textScale;
+  }, [text, vb.w, textScale]);
 
   const textPctX = (textX / vb.w) * 100;
   const textPctY = (textY / vb.h) * 100;

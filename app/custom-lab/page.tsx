@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useTransition } from "react";
 import Image from "next/image";
-import { Upload, Trash2, Plus, Sparkles, Check } from "lucide-react";
+import { Upload, Trash2, Plus, Sparkles, Check, Type, ImageIcon } from "lucide-react";
 import { ClothingMockup, PRODUCTS, COLORS, type ProductId, type MockupImage } from "@/components/ClothingMockup";
 import { FontPicker } from "@/components/FontPicker";
 
@@ -38,6 +38,7 @@ export default function CustomLab() {
   const [productType, setProductType] = useState<ProductId>("tshirt");
   const [color, setColor] = useState("#1a1a1a");
   const [textColor, setTextColor] = useState("auto");
+  const [textScale, setTextScale] = useState(1);
   const [images, setImages] = useState<MockupImage[]>([]);
   const [textX, setTextX] = useState(250);
   const [textY, setTextY] = useState(280);
@@ -236,6 +237,30 @@ export default function CustomLab() {
               </div>
             </div>
 
+            {/* Taille du texte */}
+            <div>
+              <label className="mb-3 flex items-center justify-between text-xs font-black uppercase tracking-wider text-zinc-400">
+                <span className="flex items-center gap-2">
+                  <Type size={14} />
+                  Taille du texte
+                </span>
+                <span className="font-bold text-primary">{Math.round(textScale * 100)}%</span>
+              </label>
+              <input
+                type="range"
+                min={30}
+                max={200}
+                step={5}
+                value={Math.round(textScale * 100)}
+                onChange={(e) => setTextScale(Number(e.target.value) / 100)}
+                className="w-full accent-primary"
+              />
+              <div className="mt-1 flex justify-between text-[10px] text-zinc-600">
+                <span>Petit</span>
+                <span>Grand</span>
+              </div>
+            </div>
+
             {/* Upload images */}
             <div>
               <label className="mb-3 block text-xs font-black uppercase tracking-wider text-zinc-400">
@@ -244,13 +269,13 @@ export default function CustomLab() {
 
               {/* Image list */}
               {images.length > 0 && (
-                <div className="mb-3 flex flex-wrap gap-2">
+                <div className="mb-3 space-y-2">
                   {images.map((img, idx) => (
                     <div
                       key={img.id}
-                      className="relative flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-3 py-2"
+                      className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-3 py-2"
                     >
-                      <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-black/40">
+                      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-black/40">
                         <Image
                           src={img.url}
                           alt={`Design ${idx + 1}`}
@@ -259,11 +284,28 @@ export default function CustomLab() {
                           className="object-contain p-0.5"
                         />
                       </div>
-                      <span className="text-xs text-zinc-400">#{idx + 1}</span>
+                      <div className="flex flex-1 items-center gap-2">
+                        <span className="text-xs text-zinc-400">#{idx + 1}</span>
+                        <div className="flex flex-1 items-center gap-2">
+                          <ImageIcon size={12} className="shrink-0 text-zinc-500" />
+                          <input
+                            type="range"
+                            min={20}
+                            max={400}
+                            step={10}
+                            value={img.size}
+                            onChange={(e) => handleImageUpdate(img.id, img.x, img.y, Number(e.target.value))}
+                            className="flex-1 accent-primary"
+                          />
+                          <span className="w-8 text-right text-[10px] text-zinc-500">
+                            {Math.round((img.size / 100) * 100)}%
+                          </span>
+                        </div>
+                      </div>
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(img.id)}
-                        className="ml-1 text-red-400 transition hover:text-red-300"
+                        className="shrink-0 text-red-400 transition hover:text-red-300"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -288,7 +330,7 @@ export default function CustomLab() {
               </label>
               {images.length > 0 && (
                 <p className="mt-1 text-[10px] text-zinc-600">
-                  Sur l&apos;aperçu : glisse pour déplacer, molette pour redimensionner
+                  Utilise les curseurs pour ajuster la taille de chaque image
                 </p>
               )}
             </div>
@@ -384,6 +426,7 @@ export default function CustomLab() {
                     text={text}
                     textColor={resolvedTextColor}
                     fontFamily={fontFamily}
+                    textScale={textScale}
                     images={images}
                     onImageUpdate={handleImageUpdate}
                     textX={textX}
