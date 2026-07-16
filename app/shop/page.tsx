@@ -1,6 +1,7 @@
 // app/shop/page.tsx
 
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import { ProductCard } from "@/components/ProductCard";
 import { prisma } from "@/lib/prisma";
@@ -11,6 +12,53 @@ interface ShopPageProps {
   searchParams: Promise<{
     category?: string;
   }>;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: ShopPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const category = params.category;
+
+  if (category) {
+    const cat = await prisma.category.findUnique({
+      where: { slug: category },
+      select: { name: true, description: true },
+    });
+
+    const catName = cat?.name ?? category;
+    return {
+      title: `${catName} — Boutique T-KAI`,
+      description:
+        cat?.description ??
+        `Découvre les produits de la catégorie ${catName} sur T-KAI Shop.`,
+      openGraph: {
+        title: `${catName} | T-KAI Shop`,
+        description:
+          cat?.description ??
+          `Produits ${catName} — boutique otaku streetwear T-KAI.`,
+        url: `https://tkai-shop.vercel.app/shop?category=${category}`,
+      },
+      alternates: {
+        canonical: `https://tkai-shop.vercel.app/shop?category=${category}`,
+      },
+    };
+  }
+
+  return {
+    title: "Catalogue — Boutique Otaku Streetwear T-KAI",
+    description:
+      "Explore le catalogue T-KAI : t-shirts, hoodies, casquettes et accessoires otaku streetwear. Filtrage par catégorie disponible.",
+    openGraph: {
+      title: "Catalogue | T-KAI Shop",
+      description:
+        "Explore le catalogue T-KAI : t-shirts, hoodies, casquettes et accessoires otaku streetwear.",
+      url: "https://tkai-shop.vercel.app/shop",
+    },
+    alternates: {
+      canonical: "https://tkai-shop.vercel.app/shop",
+    },
+  };
 }
 
 export default async function Shop({

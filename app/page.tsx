@@ -1,10 +1,26 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import { ProductCard } from "@/components/ProductCard";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "T-KAI | Otaku Streetwear — T-shirts, Hoodies & Accessoires Manga",
+  description:
+    "Découvre T-KAI : boutique otaku streetwear avec t-shirts, hoodies, casquettes et accessoires personnalisés inspirés manga et anime. Custom Lab disponible.",
+  openGraph: {
+    title: "T-KAI | Otaku Streetwear — T-shirts, Hoodies & Accessoires Manga",
+    description:
+      "Boutique otaku streetwear : t-shirts, hoodies, casquettes et accessoires personnalisés inspirés manga et anime.",
+    url: "https://tkai-shop.vercel.app",
+  },
+  alternates: {
+    canonical: "https://tkai-shop.vercel.app",
+  },
+};
 
 export default async function Home() {
   // PRODUITS
