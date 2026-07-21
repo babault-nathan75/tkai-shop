@@ -8,7 +8,6 @@ export const PRODUCTS = [
   { id: "cap", label: "Casquette", emoji: "\u{1F9E2}" },
   { id: "tote", label: "Tote Bag", emoji: "\u{1F45C}" },
   { id: "mug", label: "Mug", emoji: "\u2615" },
-  { id: "phone", label: "Phone Case", emoji: "\u{1F4F1}" },
 ] as const;
 
 export type ProductId = (typeof PRODUCTS)[number]["id"];
@@ -120,26 +119,12 @@ function MugShape({ color }: { color: string }) {
   );
 }
 
-function PhoneShape({ color }: { color: string }) {
-  return (
-    <>
-      <rect x="30" y="10" width="240" height="580" rx="36" ry="36" fill={color} />
-      <rect x="30" y="10" width="240" height="580" rx="36" ry="36" fill="url(#phone-shade)" />
-      <rect x="44" y="50" width="212" height="480" rx="20" ry="20" fill="rgba(0,0,0,0.6)" />
-      <circle cx="75" cy="95" r="14" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-      <circle cx="75" cy="95" r="8" fill="rgba(0,0,0,0.6)" />
-      <circle cx="110" cy="95" r="10" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-    </>
-  );
-}
-
 const SHAPES: Record<ProductId, React.FC<{ color: string }>> = {
   tshirt: TShirtShape,
   hoodie: HoodieShape,
   cap: CapShape,
   tote: ToteShape,
   mug: MugShape,
-  phone: PhoneShape,
 };
 
 const VIEWBOX: Record<ProductId, { w: number; h: number }> = {
@@ -148,7 +133,6 @@ const VIEWBOX: Record<ProductId, { w: number; h: number }> = {
   cap: { w: 500, h: 400 },
   tote: { w: 400, h: 500 },
   mug: { w: 500, h: 450 },
-  phone: { w: 300, h: 600 },
 };
 
 /* ─── Image Type ─── */
@@ -318,15 +302,10 @@ export function ClothingMockup({
                   <stop offset="40%" stopColor="rgba(255,255,255,0.1)" />
                   <stop offset="100%" stopColor="rgba(0,0,0,0.2)" />
                 </linearGradient>
-                <linearGradient id="phone-shade" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.08)" />
-                  <stop offset="100%" stopColor="rgba(0,0,0,0.12)" />
-                </linearGradient>
                 <filter id="shirt-shadow"><feDropShadow dx="0" dy="4" stdDeviation="8" floodColor="#000" floodOpacity="0.3" /></filter>
                 <filter id="hoodie-shadow"><feDropShadow dx="0" dy="4" stdDeviation="8" floodColor="#000" floodOpacity="0.3" /></filter>
                 <filter id="cap-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#000" floodOpacity="0.3" /></filter>
                 <filter id="tote-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#000" floodOpacity="0.25" /></filter>
-                <filter id="phone-shadow"><feDropShadow dx="0" dy="4" stdDeviation="8" floodColor="#000" floodOpacity="0.3" /></filter>
               </defs>
 
               <Shape color={colorName} />
