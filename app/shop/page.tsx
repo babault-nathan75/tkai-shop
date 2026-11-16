@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ArrowDown, SlidersHorizontal } from "lucide-react";
 
 import { ProductCard } from "@/components/ProductCard";
 import { prisma } from "@/lib/prisma";
@@ -97,29 +98,45 @@ export default async function Shop({
 
   return (
     <main className="min-h-screen bg-background text-white">
-      <section className="mx-auto max-w-7xl px-4 py-8 md:py-14">
-        {/* HEADER */}
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-primary md:tracking-[0.3em]">
-            Shop
-          </p>
-          <h1 className="mt-2 text-3xl font-black md:mt-3 md:text-7xl">
-            Catalogue T-KAI
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-zinc-400 md:mt-4 md:text-base">
-            Explore les dernières collections manga streetwear,
-            hoodies, casquettes et accessoires personnalisés T-KAI.
-          </p>
+      <section className="mx-auto max-w-7xl px-4 pb-14 pt-8 md:px-8 md:pb-24 md:pt-14">
+        <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-surface2 px-5 py-9 md:rounded-[2rem] md:px-12 md:py-14">
+          <div className="absolute -right-10 -top-32 h-72 w-72 rounded-full bg-primary/15 blur-[85px]" />
+          <div className="relative grid items-end gap-6 md:grid-cols-[1fr_auto]">
+            <div>
+              <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[.22em] text-primary">
+                <span className="h-px w-6 bg-primary" />
+                La collection T-KAI
+              </p>
+              <h1 className="display-type text-balance mt-4 text-5xl leading-[.92] text-foreground md:mt-6 md:text-8xl">
+                Ton univers.
+                <br />
+                <span className="italic text-primary">Ton uniforme.</span>
+              </h1>
+              <p className="mt-5 max-w-xl text-sm leading-7 text-zinc-400 md:mt-6 md:text-base">
+                Des pièces pensées pour la rue, inspirées par les univers qui
+                nous rassemblent.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[.16em] text-zinc-500 md:pb-1">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-primary">
+                <ArrowDown size={15} />
+              </span>
+              {products.length} pièce{products.length > 1 ? "s" : ""} à découvrir
+            </div>
+          </div>
         </div>
 
-        {/* CATEGORIES */}
-        <div className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-2 md:mx-0 md:mt-10 md:flex-wrap md:gap-3 md:overflow-visible md:pb-0">
+        <div className="mt-9 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-zinc-500 md:mt-14">
+          <SlidersHorizontal size={14} className="text-primary" />
+          Affiner par univers
+        </div>
+        <div className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-2 md:mx-0 md:flex-wrap md:overflow-visible md:pb-0">
           <Link
             href="/shop"
             className={`flex-shrink-0 rounded-full border px-4 py-2 text-xs font-bold transition md:px-5 md:py-3 md:text-sm ${
               !selectedCategory
                 ? "border-primary bg-primary text-white"
-                : "border-white/10 bg-surface hover:border-primary"
+                : "border-white/10 bg-white/[.025] text-zinc-400 hover:border-white/30 hover:text-white"
             }`}
           >
             Tous
@@ -134,7 +151,7 @@ export default async function Shop({
                 className={`flex-shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-xs font-bold transition md:px-5 md:py-3 md:text-sm ${
                   isActive
                     ? "border-primary bg-primary text-white"
-                    : "border-white/10 bg-surface hover:border-primary"
+                    : "border-white/10 bg-white/[.025] text-zinc-400 hover:border-white/30 hover:text-white"
                 }`}
               >
                 {category.name}
@@ -144,7 +161,7 @@ export default async function Shop({
         </div>
 
         {/* PRODUCTS */}
-        <div className="mt-6 grid grid-cols-2 gap-3 md:mt-12 md:gap-6 lg:grid-cols-3">
+        <div className="mt-7 grid grid-cols-2 gap-3 md:mt-10 md:grid-cols-3 md:gap-5 xl:grid-cols-4">
           {products.map((product) => (
             <ProductCard
               key={product.slug}
@@ -161,15 +178,21 @@ export default async function Shop({
 
         {/* EMPTY */}
         {products.length === 0 && (
-          <div className="mt-20 rounded-[2rem] border border-white/10 bg-surface p-12 text-center">
-            <h2 className="text-3xl font-black">
-              Aucun produit trouvé
+          <div className="mt-12 rounded-[1.5rem] border border-white/10 bg-surface px-6 py-16 text-center md:py-24">
+            <h2 className="display-type text-4xl text-foreground md:text-5xl">
+              Rien ici, pour l&apos;instant.
             </h2>
 
-            <p className="mt-4 text-zinc-400">
-              Aucun produit n’est disponible dans cette
-              catégorie pour le moment.
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-zinc-500">
+              Cette collection se prépare. Explore les autres univers T-KAI en
+              attendant.
             </p>
+            <Link
+              href="/shop"
+              className="mt-7 inline-flex min-h-11 items-center rounded-full bg-paper px-5 text-[10px] font-black uppercase tracking-[.14em] text-ink transition hover:bg-primary hover:text-white"
+            >
+              Voir toutes les pièces
+            </Link>
           </div>
         )}
       </section>

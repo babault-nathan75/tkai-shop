@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { DeleteButton } from "@/components/admin/DeleteButton";
+import { getActiveSalePrice } from "@/lib/promotions";
 
 export const dynamic = "force-dynamic";
 
@@ -64,8 +65,25 @@ export default async function AdminProductsPage() {
                   <td className="px-6 py-5 text-zinc-400">
                     {product.category.name}
                   </td>
-                  <td className="px-6 py-5 text-primary font-black">
-                    {product.price.toLocaleString()} FCFA
+                  <td className="px-6 py-5 font-black">
+                    {getActiveSalePrice(
+                      product.price,
+                      product.salePrice,
+                      product.saleEndsAt
+                    ) !== null ? (
+                      <span>
+                        <span className="mr-2 block text-sm text-zinc-500 line-through">
+                          {product.price.toLocaleString()} FCFA
+                        </span>
+                        <span className="text-primary">
+                          {product.salePrice?.toLocaleString()} FCFA · PROMO
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="text-primary">
+                        {product.price.toLocaleString()} FCFA
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex justify-end gap-3">

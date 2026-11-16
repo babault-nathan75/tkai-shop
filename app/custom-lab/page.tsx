@@ -10,7 +10,7 @@ const TEXT_COLORS = [
   { name: "auto", label: "Auto" },
   { name: "white", label: "Blanc", hex: "#ffffff" },
   { name: "black", label: "Noir", hex: "#000000" },
-  { name: "red", label: "Rouge", hex: "#D61F1F" },
+  { name: "red", label: "Rouge", hex: "#E44332" },
   { name: "blue", label: "Bleu", hex: "#2563EB" },
   { name: "yellow", label: "Jaune", hex: "#EAB308" },
 ];
@@ -110,32 +110,33 @@ export default function CustomLab() {
 
   return (
     <main className="min-h-screen bg-background text-white">
-      <section className="mx-auto max-w-7xl px-4 py-6 md:py-14">
-        {/* Header */}
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-primary md:tracking-[0.25em]">
-            Custom Lab
+      <section className="mx-auto max-w-7xl px-4 py-8 md:px-8 md:py-14">
+        <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-surface2 px-5 py-8 md:rounded-[2rem] md:px-12 md:py-12">
+          <div className="absolute -right-10 -top-32 h-72 w-72 rounded-full bg-primary/15 blur-[85px]" />
+          <p className="relative text-[10px] font-black uppercase tracking-[.22em] text-primary">
+            Custom Lab · ton studio
           </p>
-          <h1 className="mt-2 text-3xl font-black md:mt-3 md:text-7xl">
-            Personnalise ton outfit
+          <h1 className="display-type text-balance relative mt-4 text-4xl leading-[.95] text-foreground md:mt-5 md:text-7xl">
+            Imagine-le.
+            <span className="italic text-primary"> Porte-le.</span>
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400 md:mt-5 md:text-lg">
-            Crée ton propre style manga streetwear. Choisis ton produit, ta
+          <p className="relative mt-4 max-w-2xl text-sm leading-7 text-zinc-400 md:mt-5 md:text-base">
+            Compose ton style manga streetwear. Choisis ton produit, ta
             couleur, ajoute ton texte et tes images — l&apos;aperçu se met à jour
             en direct.
           </p>
         </div>
 
-        <div className="mt-6 grid gap-6 md:mt-14 md:gap-8 lg:grid-cols-[1fr_480px]">
+        <div className="mt-6 grid gap-5 md:mt-8 md:gap-8 lg:grid-cols-[1fr_460px]">
           {/* Formulaire */}
           <form
             onSubmit={handleSubmit}
-            className="space-y-5 rounded-2xl border border-white/10 bg-surface p-5 md:rounded-[2rem] md:p-8"
+            className="space-y-6 rounded-[1.5rem] border border-white/10 bg-surface p-5 md:rounded-[2rem] md:p-8"
           >
             {/* Type de produit */}
             <div>
-              <label className="mb-3 block text-xs font-black uppercase tracking-wider text-zinc-400">
-                Type de produit
+              <label className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-zinc-400">
+                01 / Choisis ta pièce
               </label>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
                 {PRODUCTS.map((p) => (
@@ -143,13 +144,14 @@ export default function CustomLab() {
                     key={p.id}
                     type="button"
                     onClick={() => setProductType(p.id)}
-                    className={`flex flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 text-center transition ${
+                    aria-pressed={productType === p.id}
+                    className={`flex min-h-[76px] flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 text-center transition ${
                       productType === p.id
                         ? "border-primary bg-primary/10 shadow-glow"
                         : "border-white/10 bg-black/30 hover:border-white/30"
                     }`}
                   >
-                    <span className="text-2xl">{p.emoji}</span>
+                    <span className="font-display text-xl font-black text-primary">{p.label.slice(0, 1)}</span>
                     <span className="text-[10px] font-bold leading-tight text-zinc-300">
                       {p.label}
                     </span>
@@ -160,8 +162,8 @@ export default function CustomLab() {
 
             {/* Couleur du produit */}
             <div>
-              <label className="mb-3 block text-xs font-black uppercase tracking-wider text-zinc-400">
-                Couleur du produit
+              <label className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-zinc-400">
+                02 / Choisis ta couleur
               </label>
               <div className="flex flex-wrap gap-2">
                 {COLORS.map((c) => (
@@ -170,8 +172,9 @@ export default function CustomLab() {
                     type="button"
                     onClick={() => setColor(c.hex)}
                     aria-label={`Couleur ${c.label}`}
+                    aria-pressed={color === c.hex}
                     title={c.label}
-                    className={`relative h-10 w-10 rounded-full border-2 transition ${
+                    className={`relative h-11 w-11 rounded-full border-2 transition ${
                       color === c.hex
                         ? "border-primary scale-110 shadow-glow"
                         : "border-white/10 hover:border-white/30"
@@ -196,13 +199,13 @@ export default function CustomLab() {
 
             {/* Texte */}
             <div>
-              <label className="mb-3 block text-xs font-black uppercase tracking-wider text-zinc-400">
-                Texte à imprimer
+              <label className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-zinc-400">
+                03 / Ton message
               </label>
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-5 py-4 outline-none transition focus:border-primary"
+                className="min-h-12 w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-primary"
                 placeholder="Ex: AKAI MODE"
                 maxLength={30}
               />
@@ -216,7 +219,7 @@ export default function CustomLab() {
 
             {/* Couleur du texte */}
             <div>
-              <label className="mb-3 block text-xs font-black uppercase tracking-wider text-zinc-400">
+              <label className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-zinc-400">
                 Couleur du texte
               </label>
               <div className="flex flex-wrap gap-2">
@@ -225,6 +228,7 @@ export default function CustomLab() {
                     key={tc.name}
                     type="button"
                     onClick={() => setTextColor(tc.name)}
+                    aria-pressed={textColor === tc.name}
                     className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${
                       textColor === tc.name
                         ? "border-primary bg-primary text-white"
@@ -239,7 +243,7 @@ export default function CustomLab() {
 
             {/* Taille du texte */}
             <div>
-              <label className="mb-3 flex items-center justify-between text-xs font-black uppercase tracking-wider text-zinc-400">
+              <label className="mb-3 flex items-center justify-between text-[10px] font-black uppercase tracking-[.16em] text-zinc-400">
                 <span className="flex items-center gap-2">
                   <Type size={14} />
                   Taille du texte
@@ -263,8 +267,8 @@ export default function CustomLab() {
 
             {/* Upload images */}
             <div>
-              <label className="mb-3 block text-xs font-black uppercase tracking-wider text-zinc-400">
-                Images / Logos
+              <label className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-zinc-400">
+                04 / Ajoute tes visuels
               </label>
 
               {/* Image list */}
@@ -305,6 +309,7 @@ export default function CustomLab() {
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(img.id)}
+                        aria-label={`Supprimer le visuel ${idx + 1}`}
                         className="shrink-0 text-red-400 transition hover:text-red-300"
                       >
                         <Trash2 size={14} />
@@ -315,7 +320,7 @@ export default function CustomLab() {
               )}
 
               {/* Upload button */}
-              <label className="flex cursor-pointer items-center justify-center gap-3 rounded-2xl border border-dashed border-primary/40 bg-black/30 px-5 py-6 transition hover:bg-primary/5">
+              <label className="flex min-h-16 cursor-pointer items-center justify-center gap-3 rounded-2xl border border-dashed border-white/20 bg-white/[.02] px-5 py-6 transition hover:border-primary/60 hover:bg-primary/5">
                 <Plus size={18} className="text-zinc-400" />
                 <span className="text-sm font-bold text-zinc-300">
                   {images.length === 0 ? "Importer une image" : "Ajouter une image"}
@@ -337,62 +342,74 @@ export default function CustomLab() {
 
             {/* Infos client */}
             <div className="grid gap-4 sm:grid-cols-2">
-              <input
-                required
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="Ton nom"
-                className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 outline-none transition focus:border-primary"
-                autoComplete="name"
-              />
-              <input
-                required
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Ton email"
-                className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 outline-none transition focus:border-primary"
-                autoComplete="email"
-              />
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Téléphone (optionnel)"
-                className="rounded-2xl border border-white/10 bg-black/40 px-5 py-4 outline-none transition focus:border-primary sm:col-span-2"
-                autoComplete="tel"
-              />
+              <p className="text-[10px] font-black uppercase tracking-[.16em] text-zinc-400 sm:col-span-2">
+                05 / Tes coordonnées
+              </p>
+              <label className="grid gap-2 text-[10px] font-black uppercase tracking-[.12em] text-zinc-400">
+                Ton nom
+                <input
+                  required
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Ex. Aïcha Koné"
+                  className="min-h-12 rounded-2xl border border-white/10 bg-black/30 px-4 text-sm font-medium normal-case tracking-normal text-white outline-none transition placeholder:text-zinc-600 focus:border-primary"
+                  autoComplete="name"
+                />
+              </label>
+              <label className="grid gap-2 text-[10px] font-black uppercase tracking-[.12em] text-zinc-400">
+                Ton e-mail
+                <input
+                  required
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="toi@exemple.com"
+                  className="min-h-12 rounded-2xl border border-white/10 bg-black/30 px-4 text-sm font-medium normal-case tracking-normal text-white outline-none transition placeholder:text-zinc-600 focus:border-primary"
+                  autoComplete="email"
+                />
+              </label>
+              <label className="grid gap-2 text-[10px] font-black uppercase tracking-[.12em] text-zinc-400 sm:col-span-2">
+                Téléphone <span className="font-medium normal-case tracking-normal text-zinc-600">(facultatif)</span>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+225 07 00 00 00 00"
+                  className="min-h-12 rounded-2xl border border-white/10 bg-black/30 px-4 text-sm font-medium normal-case tracking-normal text-white outline-none transition placeholder:text-zinc-600 focus:border-primary"
+                  autoComplete="tel"
+                />
+              </label>
             </div>
 
             {/* Notes */}
             <div>
-              <label className="mb-3 block text-xs font-black uppercase tracking-wider text-zinc-400">
-                Notes supplémentaires
+              <label className="mb-3 block text-[10px] font-black uppercase tracking-[.16em] text-zinc-400">
+                06 / Notes supplémentaires
               </label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={4}
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-5 py-4 outline-none transition focus:border-primary"
+                className="min-h-12 w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-4 text-sm outline-none transition placeholder:text-zinc-600 focus:border-primary"
                 placeholder="Décris ton idée, le positionnement souhaité..."
               />
             </div>
 
             {error && (
-              <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">
+              <div role="alert" className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300">
                 {error}
               </div>
             )}
 
             {done ? (
-              <div className="inline-flex items-center gap-3 rounded-full bg-green-500/20 px-6 py-3 font-black text-green-300">
+              <div className="inline-flex min-h-12 items-center gap-3 rounded-full bg-green-500/10 px-6 py-3 text-sm font-black text-green-300">
                 <Check size={18} /> Demande envoyée — on te recontacte vite.
               </div>
             ) : (
               <button
                 type="submit"
                 disabled={isPending}
-                className="inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 font-black text-white shadow-glow transition hover:scale-105 hover:bg-accent disabled:opacity-50"
+                className="inline-flex min-h-12 items-center gap-3 rounded-full bg-primary px-7 text-[10px] font-black uppercase tracking-[.14em] text-white transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Sparkles size={20} />
                 {isPending ? "Envoi..." : "Envoyer la demande"}
@@ -401,21 +418,21 @@ export default function CustomLab() {
           </form>
 
           {/* Preview */}
-          <div className="sticky top-24 self-start">
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.06] bg-[#0c0c0c] p-6 md:p-8">
+          <div className="self-start lg:sticky lg:top-24">
+            <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-surface2 p-4 md:rounded-[2rem] md:p-7">
               {/* Texture de fond */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(214,31,31,0.06),transparent_60%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(228,67,50,0.08),transparent_60%)]" />
               <div className="absolute inset-0 opacity-[0.03] bg-[repeating-conic-gradient(rgba(255,255,255,0.1)_0%_25%,transparent_0%_50%)] bg-[length:4px_4px]" />
 
               <div className="relative z-10">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
-                    Live Preview
+                  <p className="text-[10px] font-black uppercase tracking-[.2em] text-primary">
+                    En direct
                   </p>
                 </div>
-                <h2 className="mt-1 text-xl font-black text-white/90">
-                  Prévisualisation
+                <h2 className="display-type mt-2 text-3xl text-foreground">
+                  Ton aperçu.
                 </h2>
 
                 {/* Product Preview */}
@@ -440,7 +457,7 @@ export default function CustomLab() {
                   <div className="flex items-center justify-between rounded-xl border border-white/[0.04] bg-white/[0.02] px-4 py-2.5">
                     <span className="text-xs text-zinc-500">Produit</span>
                     <span className="text-xs font-bold text-white/80">
-                      {productObj?.emoji} {productObj?.label}
+                      {productObj?.label}
                     </span>
                   </div>
                   <div className="flex items-center justify-between rounded-xl border border-white/[0.04] bg-white/[0.02] px-4 py-2.5">

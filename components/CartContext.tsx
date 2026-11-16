@@ -8,12 +8,16 @@ import {
   useMemo,
   useState,
 } from "react";
+import { getActiveSalePrice } from "@/lib/promotions";
 
 export interface CartItem {
   productId: number;
   slug: string;
   name: string;
+  // price is the regular price; active promotions are applied from their deadline.
   price: number;
+  promoPrice?: number | null;
+  promoEndsAt?: string | null;
   image: string;
   size?: string;
   color?: string;
@@ -24,6 +28,7 @@ interface CartContextValue {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
+  now: number;
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
   removeItem: (productId: number, size?: string, color?: string) => void;
   updateQuantity: (
@@ -43,9 +48,17 @@ function lineKey(item: { productId: number; size?: string; color?: string }) {
   return `${item.productId}::${item.size || ""}::${item.color || ""}`;
 }
 
+export function getCartItemPrice(item: CartItem, now = Date.now()) {
+  return (
+    getActiveSalePrice(item.price, item.promoPrice, item.promoEndsAt, now) ??
+    item.price
+  );
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
     try {
@@ -59,6 +72,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    setNow(Date.now());
+
+    if (!items.some((item) => item.promoPrice && item.promoEndsAt)) return;
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [items, hydrated]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -77,7 +99,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (existing) {
           return prev.map((it) =>
             lineKey(it) === key
-              ? { ...it, quantity: it.quantity + quantity }
+              ? { ...it, ...incoming, quantity: it.quantity + quantity }
               : it
           );
         }
@@ -113,18 +135,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<CartContextValue>(() => {
     const totalItems = items.reduce((s, it) => s + it.quantity, 0);
-    const totalPrice = items.reduce((s, it) => s + it.quantity * it.price, 0);
+    const totalPrice = items.reduce(
+      (sum, item) => sum + item.quantity * getCartItemPrice(item, now),
+      0
+    );
     return {
       items,
       totalItems,
       totalPrice,
+      now,
       addItem,
       removeItem,
       updateQuantity,
       clear,
       hydrated,
     };
-  }, [items, addItem, removeItem, updateQuantity, clear, hydrated]);
+  }, [items, addItem, removeItem, updateQuantity, clear, hydrated, now]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

@@ -20,6 +20,8 @@ export async function PUT(request: Request, { params }: Params) {
     name?: string;
     description?: string;
     price?: number;
+    salePrice?: number | null;
+    saleEndsAt?: string | null;
     image?: string;
     categoryId?: number;
   };
@@ -34,6 +36,8 @@ export async function PUT(request: Request, { params }: Params) {
     slug?: string;
     description?: string;
     price?: number;
+    salePrice?: number | null;
+    saleEndsAt?: Date | null;
     categoryId?: number;
   } = {};
   if (body.name) {
@@ -47,7 +51,39 @@ export async function PUT(request: Request, { params }: Params) {
   }
   if (body.description !== undefined)
     data.description = String(body.description);
-  if (body.price !== undefined) data.price = Number(body.price);
+  if (body.price !== undefined) {
+    const price = Number(body.price);
+    if (!Number.isInteger(price) || price <= 0) {
+      return NextResponse.json({ message: "Prix invalide" }, { status: 400 });
+    }
+    data.price = price;
+  }
+  if (body.salePrice !== undefined || body.saleEndsAt !== undefined) {
+    const salePrice =
+      body.salePrice == null ? null : Number(body.salePrice);
+    const saleEndsAt = body.saleEndsAt ? new Date(body.saleEndsAt) : null;
+    const currentPrice =
+      data.price ??
+      (
+        await prisma.product.findUnique({
+          where: { id: productId },
+          select: { price: true },
+        })
+      )?.price;
+    if (
+      (salePrice !== null &&
+        (!Number.isInteger(salePrice) ||
+          salePrice <= 0 ||
+          currentPrice === undefined ||
+          salePrice >= currentPrice)) ||
+      (saleEndsAt && (!Number.isFinite(saleEndsAt.getTime()) || saleEndsAt <= new Date())) ||
+      Boolean(salePrice) !== Boolean(saleEndsAt)
+    ) {
+      return NextResponse.json({ message: "Promotion invalide" }, { status: 400 });
+    }
+    data.salePrice = salePrice;
+    data.saleEndsAt = saleEndsAt;
+  }
   if (body.categoryId !== undefined) data.categoryId = Number(body.categoryId);
 
   await prisma.product.update({ where: { id: productId }, data });

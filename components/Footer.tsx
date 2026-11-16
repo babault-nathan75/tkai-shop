@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Facebook, Instagram } from "lucide-react";
+import { ArrowUpRight, Facebook, Mail, MoveRight, Phone } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
 
@@ -22,127 +22,110 @@ export async function Footer() {
   const categories = await getCachedCategories();
 
   return (
-    <footer className="relative overflow-hidden border-t border-white/10 bg-black text-zinc-400">
-      <div className="absolute left-1/2 top-0 h-48 w-48 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl md:h-72 md:w-72" />
-
-      <div className="relative mx-auto max-w-7xl px-4 py-10 md:py-16">
-        <div className="grid gap-8 md:grid-cols-3 md:gap-12">
-          {/* BRAND */}
+    <footer className="relative overflow-hidden border-t border-white/10 bg-background text-zinc-400">
+      <div className="absolute -right-24 -top-32 h-80 w-80 rounded-full bg-primary/10 blur-[100px]" />
+      <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-12 md:px-8 md:pb-10 md:pt-20">
+        <div className="grid gap-12 border-b border-white/10 pb-12 md:grid-cols-[1.35fr_.8fr_1fr] md:gap-16 md:pb-16">
           <div>
-            <div className="flex items-center gap-3">
-              <div className="h-2.5 w-2.5 rounded-full bg-primary shadow-glow md:h-3 md:w-3" />
-              <h3 className="text-2xl font-black tracking-tight text-white md:text-3xl">
+            <Link href="/" className="group inline-flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-xs font-black tracking-[.12em] text-primary transition group-hover:rotate-[-8deg]">
+                TK
+              </span>
+              <span className="text-xl font-black tracking-[.22em] text-foreground">
                 T-KAI
-              </h3>
-            </div>
-
-            <p className="mt-3 max-w-sm text-sm leading-relaxed text-zinc-400 md:mt-5 md:text-base">
-              Otaku streetwear. Manga energy. Urban identity. Le style qui
-              définit la nouvelle génération.
+              </span>
+            </Link>
+            <p className="display-type mt-6 max-w-sm text-3xl leading-tight text-foreground md:text-4xl">
+              Porte ce que tu <span className="italic text-primary">aimes.</span>
             </p>
-
-            <div className="mt-4 flex items-center gap-3 md:mt-6 md:gap-4">
-              <Link
-                href="#"
-                aria-label="Instagram"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-surface transition hover:border-primary hover:bg-primary/10 hover:text-white md:h-11 md:w-11"
-              >
-                <Instagram size={16} className="md:h-[18px] md:w-[18px]" />
-              </Link>
+            <p className="mt-4 max-w-sm text-sm leading-6 text-zinc-500">
+              Otaku streetwear imaginé à Abidjan. Une culture, mille façons de
+              la porter.
+            </p>
+            <div className="mt-6 flex items-center gap-3">
               <Link
                 href="https://www.facebook.com/share/18jd899x2M/"
-                aria-label="Facebook"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-surface transition hover:border-primary hover:bg-primary/10 hover:text-white md:h-11 md:w-11"
+                aria-label="Facebook T-KAI"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:border-primary hover:text-white"
               >
-                <Facebook size={16} className="md:h-[18px] md:w-[18px]" />
+                <Facebook size={16} />
               </Link>
             </div>
           </div>
 
-          {/* COLLECTIONS */}
           <div>
-            <h4 className="mb-3 text-[10px] font-black uppercase tracking-[0.25em] text-primary md:mb-6 md:text-xs md:tracking-[0.3em]">
-              Collections
-            </h4>
-
-            <nav className="grid gap-2 md:gap-3">
-              {categories.map((category) => (
+            <h2 className="text-[10px] font-black uppercase tracking-[.22em] text-primary">
+              La boutique
+            </h2>
+            <nav className="mt-5 grid gap-3">
+              <Link
+                href="/shop"
+                className="group flex items-center justify-between border-b border-white/[.06] pb-3 text-sm text-zinc-400 transition hover:text-white"
+              >
+                Toute la collection
+                <ArrowUpRight size={14} className="text-zinc-600 group-hover:text-primary" />
+              </Link>
+              {categories.slice(0, 4).map((category) => (
                 <Link
                   key={category.id}
                   href={`/shop?category=${category.slug}`}
-                  className="group flex items-center gap-3 text-sm transition hover:text-white md:text-base"
+                  className="group flex items-center justify-between border-b border-white/[.06] pb-3 text-sm text-zinc-400 transition hover:text-white"
                 >
-                  <div className="h-2 w-2 rounded-full bg-primary/40 transition group-hover:bg-primary" />
-                  <span className="font-medium">{category.name}</span>
+                  {category.name}
+                  <ArrowUpRight size={14} className="text-zinc-600 group-hover:text-primary" />
                 </Link>
               ))}
-
-              {categories.length === 0 && (
-                <p className="text-xs text-zinc-500 md:text-sm">
-                  Aucune collection pour le moment.
-                </p>
-              )}
+              <Link
+                href="/custom-lab"
+                className="group flex items-center justify-between border-b border-white/[.06] pb-3 text-sm text-zinc-400 transition hover:text-white"
+              >
+                Custom Lab
+                <ArrowUpRight size={14} className="text-zinc-600 group-hover:text-primary" />
+              </Link>
             </nav>
           </div>
 
-          {/* CONTACT */}
           <div>
-            <h4 className="mb-3 text-[10px] font-black uppercase tracking-[0.25em] text-primary md:mb-6 md:text-xs md:tracking-[0.3em]">
-              Infos & Contact
-            </h4>
-
-            <div className="space-y-3 text-sm md:space-y-4">
-              <div className="rounded-xl border border-white/10 bg-surface p-3 md:rounded-2xl md:p-4">
-                <p className="font-bold text-white">📍 Livraison</p>
-                <p className="mt-1 text-xs text-zinc-400 md:mt-2 md:text-sm">
-                  Livraison partout en Côte d&rsquo;Ivoire.
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/10 bg-surface p-3 md:rounded-2xl md:p-4">
-                <p className="font-bold text-white">💳 Paiement</p>
-                <p className="mt-1 text-xs text-zinc-400 md:mt-2 md:text-sm">
-                  Mobile Money (MTN, Orange), Carte bancaire, PayPal. Paiement
-                  sécurisé à 100%.
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 md:rounded-2xl md:p-4">
-                <p className="text-[10px] uppercase tracking-widest text-primary md:text-xs">
-                  Support
-                </p>
-                <p className="mt-1 break-all text-sm font-bold text-white md:mt-2 md:text-base">
-                  tkaishop26@gmail.com
-                </p>
-                <p className="mt-1 break-all text-sm font-bold text-white md:mt-2 md:text-base">
-                  +225 05 00 90 34 33
-                </p>
-              </div>
+            <h2 className="text-[10px] font-black uppercase tracking-[.22em] text-primary">
+              Besoin d&apos;aide ?
+            </h2>
+            <p className="mt-5 max-w-sm text-sm leading-6 text-zinc-500">
+              Une question sur une pièce, ta commande ou une personnalisation ?
+              Notre équipe est là pour toi.
+            </p>
+            <div className="mt-5 grid gap-3">
+              <a
+                href="mailto:tkaishop26@gmail.com"
+                className="flex min-h-11 items-center gap-3 rounded-xl border border-white/10 bg-white/[.025] px-4 text-sm text-zinc-300 transition hover:border-primary/40 hover:text-white"
+              >
+                <Mail size={15} className="text-primary" />
+                tkaishop26@gmail.com
+              </a>
+              <a
+                href="tel:+2250500903433"
+                className="flex min-h-11 items-center gap-3 rounded-xl border border-white/10 bg-white/[.025] px-4 text-sm text-zinc-300 transition hover:border-primary/40 hover:text-white"
+              >
+                <Phone size={15} className="text-primary" />
+                +225 05 00 90 34 33
+              </a>
             </div>
+            <p className="mt-5 text-[10px] font-bold uppercase tracking-[.14em] text-zinc-600">
+              Livraison partout en Côte d&apos;Ivoire
+            </p>
           </div>
         </div>
 
-        <div className="mt-8 border-t border-white/5 pt-5 md:mt-14 md:pt-8">
-          <div className="flex flex-col items-center justify-between gap-3 md:flex-row md:gap-4">
-            <p className="text-center text-[10px] uppercase tracking-[0.25em] text-zinc-500 md:text-xs md:tracking-[0.3em]">
-              © {currentYear} <Link href="/admin" className="transition hover:text-white">T-KAI Studio</Link>. Tous les droits réservés.
-            </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] uppercase tracking-wider text-zinc-500 md:gap-6 md:text-xs">
-              <Link href="/" className="transition hover:text-white">
-                Accueil
-              </Link>
-              <Link href="/shop" className="transition hover:text-white">
-                Boutique
-              </Link>
-              <Link href="/custom-lab" className="transition hover:text-white">
-                Personaliser
-              </Link>
-              <Link href="/track" className="transition hover:text-white">
-                Mes commandes
-              </Link>
-            </div>
-          </div>
+        <div className="flex flex-col items-center justify-between gap-5 pt-6 sm:flex-row">
+          <p className="text-center text-[10px] uppercase tracking-[.12em] text-zinc-600 sm:text-left">
+            © {currentYear} T-KAI Studio. Tous les droits réservés.
+          </p>
+          <Link
+            href="/shop"
+            className="group inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.16em] text-zinc-400 transition hover:text-white"
+          >
+            Rejoindre la collection
+            <MoveRight size={14} className="text-primary transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
       </div>
     </footer>

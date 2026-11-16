@@ -1,0 +1,3 @@
+ALTER TABLE "Product"
+  ADD COLUMN "salePrice" INTEGER,
+  ADD COLUMN "saleEndsAt" TIMESTAMP(3);

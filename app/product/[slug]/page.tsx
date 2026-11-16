@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProductDetailClient } from "@/components/ProductDetailClient";
+import { getActiveSalePrice } from "@/lib/promotions";
 
 export const revalidate = 60;
 
@@ -20,6 +22,8 @@ export async function generateMetadata({
       name: true,
       description: true,
       price: true,
+      salePrice: true,
+      saleEndsAt: true,
       slug: true,
       images: { select: { url: true }, orderBy: { position: "asc" }, take: 1 },
       category: { select: { name: true, slug: true } },
@@ -118,7 +122,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
     offers: {
       "@type": "Offer",
       priceCurrency: "XOF",
-      price: product.price,
+      price:
+        getActiveSalePrice(
+          product.price,
+          product.salePrice,
+          product.saleEndsAt
+        ) ?? product.price,
       availability: "https://schema.org/InStock",
       url: `https://tkai-shop.vercel.app/product/${product.slug}`,
     },
@@ -165,13 +174,22 @@ export default async function ProductPage({ params }: ProductPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <section className="mx-auto max-w-7xl px-4 py-6 text-white md:py-14">
+      <section className="mx-auto max-w-7xl px-4 py-7 text-white md:px-8 md:py-12">
+        <Link
+          href="/shop"
+          className="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-zinc-500 transition hover:text-white md:mb-8"
+        >
+          <span aria-hidden="true">←</span> Retour à la collection
+        </Link>
         <ProductDetailClient
           product={{
             id: product.id,
             slug: product.slug,
             name: product.name,
             price: product.price,
+            salePrice: product.salePrice,
+            saleEndsAt: product.saleEndsAt?.toISOString() ?? null,
+            promoReferenceTime: Date.now(),
             description: product.description,
             categoryName: product.category.name,
           }}

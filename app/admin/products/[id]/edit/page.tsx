@@ -2,7 +2,9 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProductImagesEditor } from "@/components/admin/ProductImagesEditor";
+import { PromoFields } from "@/components/admin/PromoFields";
 import { parseImageRows } from "@/lib/product-images";
+import { getActiveSalePrice, getPromotionFromForm } from "@/lib/promotions";
 
 interface EditPageProps {
   params: Promise<{ id: string }>;
@@ -31,7 +33,18 @@ export default async function EditProductPage({ params }: EditPageProps) {
     const price = Number(formData.get("price") || 0);
     const categoryId = Number(formData.get("categoryId") || 0);
 
-    if (!name || !description || !price || !categoryId) return;
+    if (
+      !name ||
+      !description ||
+      !Number.isInteger(price) ||
+      price <= 0 ||
+      !Number.isInteger(categoryId) ||
+      categoryId <= 0
+    ) {
+      throw new Error("Renseigne un nom, une description, un prix et une catégorie valides.");
+    }
+
+    const promotion = getPromotionFromForm(formData, price);
 
     const slug = name
       .toLowerCase()
@@ -44,7 +57,7 @@ export default async function EditProductPage({ params }: EditPageProps) {
     await prisma.$transaction([
       prisma.product.update({
         where: { id: productId },
-        data: { name, slug, description, price, categoryId },
+        data: { name, slug, description, price, categoryId, ...promotion },
       }),
       prisma.productImage.deleteMany({ where: { productId } }),
       ...(images.length > 0
@@ -69,6 +82,11 @@ export default async function EditProductPage({ params }: EditPageProps) {
     color: img.color || "",
     url: img.url,
   }));
+  const remainingHours = product.saleEndsAt
+    ? Math.max(1, Math.ceil((product.saleEndsAt.getTime() - Date.now()) / 3_600_000))
+    : 1;
+  const initiallyEnabled =
+    getActiveSalePrice(product.price, product.salePrice, product.saleEndsAt) !== null;
 
   return (
     <main className="min-h-screen bg-background px-4 py-10 text-white">
@@ -128,9 +146,19 @@ export default async function EditProductPage({ params }: EditPageProps) {
               name="price"
               defaultValue={product.price}
               required
+              min="1"
+              step="1"
               className="w-full rounded-2xl border border-white/10 bg-black/40 px-5 py-4 outline-none focus:border-primary"
             />
           </div>
+
+          <PromoFields
+            price={product.price}
+            initialSalePrice={product.salePrice}
+            initialDays={Math.floor(remainingHours / 24)}
+            initialHours={remainingHours % 24}
+            initiallyEnabled={initiallyEnabled}
+          />
 
           <div>
             <label className="mb-3 block text-sm font-bold uppercase tracking-wider text-zinc-400">

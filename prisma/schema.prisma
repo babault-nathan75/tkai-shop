@@ -55,6 +55,8 @@ model Product {
   slug        String           @unique
   description String
   price       Int
+  salePrice   Int?
+  saleEndsAt  DateTime?
   featured    Boolean          @default(false)
   categoryId  Int
   category    Category         @relation(fields: [categoryId], references: [id])

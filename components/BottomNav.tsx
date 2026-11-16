@@ -68,7 +68,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/90 backdrop-blur-xl md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-background/95 backdrop-blur-2xl md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="Navigation principale"
     >
@@ -80,8 +80,8 @@ export function BottomNav() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`relative flex flex-col items-center justify-center gap-1 px-2 py-2.5 text-[10px] font-bold uppercase tracking-wider transition ${
-                  active ? "text-primary" : "text-zinc-400 hover:text-white"
+                className={`relative flex min-h-16 flex-col items-center justify-center gap-1 px-2 py-2 text-[9px] font-bold uppercase tracking-[.12em] transition ${
+                  active ? "text-accent" : "text-zinc-500 hover:text-white"
                 }`}
                 aria-current={active ? "page" : undefined}
               >
@@ -89,7 +89,7 @@ export function BottomNav() {
                   <Icon
                     size={22}
                     strokeWidth={active ? 2.5 : 2}
-                    className={active ? "drop-shadow-[0_0_8px_rgba(214,31,31,0.6)]" : ""}
+                    className={active ? "drop-shadow-[0_0_8px_rgba(228,67,50,0.45)]" : ""}
                   />
                   {item.badge !== undefined && item.badge > 0 && (
                     <span

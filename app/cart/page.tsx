@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
-import { useCart } from "@/components/CartContext";
+import { getCartItemPrice, useCart } from "@/components/CartContext";
 import { formatPrice } from "@/lib/data";
 
 export default function CartPage() {
@@ -11,6 +11,7 @@ export default function CartPage() {
     items,
     totalItems,
     totalPrice,
+    now,
     updateQuantity,
     removeItem,
     clear,
@@ -20,27 +21,31 @@ export default function CartPage() {
   if (!hydrated) {
     return (
       <section className="mx-auto max-w-5xl px-4 py-14 text-white">
-        <h1 className="text-5xl font-black">Panier</h1>
-        <p className="mt-6 text-zinc-400">Chargement du panier...</p>
+        <p className="text-[10px] font-black uppercase tracking-[.2em] text-primary">Ta sélection</p>
+        <h1 className="display-type mt-3 text-5xl text-foreground md:text-7xl">Ton panier.</h1>
+        <p className="mt-6 text-sm text-zinc-500">On prépare tes pièces…</p>
       </section>
     );
   }
 
   if (items.length === 0) {
     return (
-      <section className="mx-auto max-w-5xl px-4 py-14 text-white">
-        <h1 className="text-5xl font-black">Panier</h1>
-        <div className="mt-10 rounded-3xl border border-white/10 bg-surface p-12 text-center">
-          <ShoppingBag size={48} className="mx-auto text-primary" />
-          <h2 className="mt-6 text-3xl font-black">Ton panier est vide</h2>
-          <p className="mt-3 text-zinc-400">
-            Explore la boutique et ajoute des produits à ton panier.
+      <section className="mx-auto max-w-5xl px-4 py-10 text-white md:py-20">
+        <p className="text-[10px] font-black uppercase tracking-[.2em] text-primary">Ta sélection</p>
+        <h1 className="display-type mt-3 text-5xl text-foreground md:text-7xl">Ton panier.</h1>
+        <div className="paper-noise mt-10 rounded-[1.5rem] px-6 py-14 text-center text-ink shadow-paper md:rounded-[2rem] md:py-20">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <ShoppingBag size={25} />
+          </div>
+          <h2 className="display-type mt-5 text-3xl md:text-4xl">Une page encore blanche.</h2>
+          <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-ink/60">
+            Les pièces qui te ressemblent t&apos;attendent dans la collection.
           </p>
           <Link
             href="/shop"
-            className="mt-8 inline-block rounded-full bg-primary px-7 py-4 font-black text-white shadow-glow transition hover:scale-105 hover:bg-accent"
+            className="mt-7 inline-flex min-h-12 items-center gap-3 rounded-full bg-ink px-6 text-[10px] font-black uppercase tracking-[.14em] text-paper transition hover:bg-primary"
           >
-            Aller à la boutique
+            Découvrir la collection <span aria-hidden="true">↗</span>
           </Link>
         </div>
       </section>
@@ -48,45 +53,45 @@ export default function CartPage() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-6 text-white md:py-14">
-      <div className="flex items-end justify-between gap-2">
+    <section className="mx-auto max-w-7xl px-4 py-8 text-white md:px-8 md:py-14">
+      <div className="flex items-end justify-between gap-4 border-b border-white/10 pb-6 md:pb-8">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-primary md:tracking-[0.25em]">
-            Panier
+          <p className="text-[10px] font-black uppercase tracking-[.2em] text-primary">
+            Ta sélection · {String(totalItems).padStart(2, "0")}
           </p>
-          <h1 className="mt-1 text-3xl font-black md:mt-2 md:text-5xl">
-            {totalItems} article{totalItems > 1 ? "s" : ""}
+          <h1 className="display-type mt-3 text-4xl text-foreground md:text-6xl">
+            Prêt à sortir.
           </h1>
         </div>
         <button
           onClick={clear}
-          className="text-xs font-bold text-zinc-400 transition hover:text-red-400 md:text-sm"
+          className="min-h-10 rounded-full border border-white/10 px-4 text-[9px] font-black uppercase tracking-[.13em] text-zinc-500 transition hover:border-primary hover:text-white md:text-[10px]"
         >
           Vider
         </button>
       </div>
 
-      <div className="mt-6 grid gap-6 md:mt-10 md:gap-8 lg:grid-cols-[1fr_360px]">
-        <div className="space-y-4">
+      <div className="mt-6 grid items-start gap-6 md:mt-9 md:gap-10 lg:grid-cols-[1fr_370px]">
+        <div className="space-y-3">
           {items.map((item) => (
             <div
               key={`${item.productId}-${item.size || ""}-${item.color || ""}`}
-              className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-surface p-4 sm:flex-row sm:items-center"
+              className="flex flex-col gap-4 rounded-[1.25rem] border border-white/[.08] bg-surface p-3.5 transition hover:border-white/15 sm:flex-row sm:items-center md:gap-5 md:rounded-[1.5rem] md:p-4"
             >
-              <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl bg-black/40">
+              <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl bg-paper-muted md:h-28 md:w-28">
                 <Image
                   src={item.image || "/logo-tkai.jpeg"}
                   alt={item.name}
                   fill
                   sizes="96px"
-                  className="object-cover p-2"
+                  className="object-contain p-2 mix-blend-multiply"
                 />
               </div>
 
               <div className="flex-1">
                 <Link
                   href={`/product/${item.slug}`}
-                  className="font-black hover:text-primary"
+                  className="font-bold text-foreground transition hover:text-accent"
                 >
                   {item.name}
                 </Link>
@@ -95,8 +100,8 @@ export default function CartPage() {
                     {[item.size, item.color].filter(Boolean).join(" · ")}
                   </p>
                 )}
-                <p className="mt-2 text-primary font-black">
-                  {formatPrice(item.price)}
+                <p className="mt-2 text-sm font-black text-primary">
+                  {formatPrice(getCartItemPrice(item, now))}
                 </p>
               </div>
 
@@ -111,7 +116,7 @@ export default function CartPage() {
                     )
                   }
                   aria-label="Diminuer la quantité"
-                  className="rounded-full border border-white/10 p-2 hover:border-primary"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:border-primary hover:text-white"
                 >
                   <Minus size={14} />
                 </button>
@@ -128,7 +133,7 @@ export default function CartPage() {
                     )
                   }
                   aria-label="Augmenter la quantité"
-                  className="rounded-full border border-white/10 p-2 hover:border-primary"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-zinc-400 transition hover:border-primary hover:text-white"
                 >
                   <Plus size={14} />
                 </button>
@@ -139,7 +144,7 @@ export default function CartPage() {
                   removeItem(item.productId, item.size, item.color)
                 }
                 aria-label="Retirer l'article"
-                className="rounded-full border border-red-500/40 p-2 text-red-400 hover:bg-red-500/10"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-zinc-500 transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400"
               >
                 <Trash2 size={16} />
               </button>
@@ -147,34 +152,36 @@ export default function CartPage() {
           ))}
         </div>
 
-        <aside className="h-fit rounded-3xl border border-white/10 bg-surface p-6">
-          <h2 className="text-xl font-black uppercase">Récapitulatif</h2>
-          <div className="mt-6 flex items-center justify-between text-zinc-400">
+        <aside className="relative h-fit overflow-hidden rounded-[1.5rem] border border-white/10 bg-surface2 p-5 md:sticky md:top-32 md:p-7">
+          <div className="absolute left-0 right-0 top-0 h-1 bg-primary" />
+          <p className="text-[10px] font-black uppercase tracking-[.2em] text-primary">La suite</p>
+          <h2 className="display-type mt-2 text-3xl text-foreground">Récapitulatif</h2>
+          <div className="mt-7 flex items-center justify-between text-sm text-zinc-500">
             <span>Sous-total</span>
             <span className="font-bold text-white">
               {formatPrice(totalPrice)}
             </span>
           </div>
-          <div className="mt-2 flex items-center justify-between text-zinc-400">
+          <div className="mt-3 flex items-center justify-between text-sm text-zinc-500">
             <span>Livraison</span>
             <span className="text-zinc-500">À confirmer</span>
           </div>
-          <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
-            <span className="font-black uppercase">Total</span>
-            <span className="text-2xl font-black text-primary">
+          <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-5">
+            <span className="text-[10px] font-black uppercase tracking-[.15em] text-zinc-400">Total</span>
+            <span className="text-2xl font-black text-foreground">
               {formatPrice(totalPrice)}
             </span>
           </div>
 
           <Link
             href="/checkout"
-            className="mt-6 block w-full rounded-full bg-primary px-7 py-4 text-center font-black text-white shadow-glow transition hover:bg-accent"
+            className="mt-6 flex min-h-[52px] w-full items-center justify-center rounded-full bg-primary px-5 text-center text-[10px] font-black uppercase tracking-[.15em] text-white transition hover:bg-accent"
           >
             Passer au checkout
           </Link>
           <Link
             href="/shop"
-            className="mt-3 block w-full rounded-full border border-white/10 px-7 py-3 text-center text-sm font-bold transition hover:border-primary"
+            className="mt-3 flex min-h-11 w-full items-center justify-center rounded-full border border-white/10 px-5 text-center text-[9px] font-black uppercase tracking-[.14em] text-zinc-400 transition hover:border-white/30 hover:text-white"
           >
             Continuer mes achats
           </Link>

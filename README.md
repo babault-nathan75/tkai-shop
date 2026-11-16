@@ -7,6 +7,7 @@ stockage images en ligne, et expérience mobile type app.
 ## ✨ Fonctionnalités
 
 - 🛍️ **Boutique** : catalogue produits avec multi-images par couleur, toggle visuel
+- 🔥 **Promotions** : prix réduit avec durée configurable et compte à rebours
 - 🎨 **Custom Lab** : demandes de personnalisation
 - 🛒 **Panier persistant** (localStorage)
 - 💬 **Checkout sans paiement en ligne** : notification équipe pour finalisation manuelle

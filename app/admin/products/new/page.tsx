@@ -2,7 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ProductImagesEditor } from "@/components/admin/ProductImagesEditor";
+import { PromoFields } from "@/components/admin/PromoFields";
 import { parseImageRows } from "@/lib/product-images";
+import { getPromotionFromForm } from "@/lib/promotions";
 
 async function createProduct(formData: FormData) {
   "use server";
@@ -12,7 +14,18 @@ async function createProduct(formData: FormData) {
   const price = Number(formData.get("price") || 0);
   const categoryId = Number(formData.get("categoryId") || 0);
 
-  if (!name || !description || !price || !categoryId) return;
+  if (
+    !name ||
+    !description ||
+    !Number.isInteger(price) ||
+    price <= 0 ||
+    !Number.isInteger(categoryId) ||
+    categoryId <= 0
+  ) {
+    throw new Error("Renseigne un nom, une description, un prix et une catégorie valides.");
+  }
+
+  const promotion = getPromotionFromForm(formData, price);
 
   const slug = name
     .toLowerCase()
@@ -28,6 +41,7 @@ async function createProduct(formData: FormData) {
       slug,
       description,
       price,
+      ...promotion,
       categoryId,
       images:
         images.length > 0
@@ -122,10 +136,14 @@ export default async function NewProductPage() {
                 type="number"
                 name="price"
                 required
+                min="1"
+                step="1"
                 placeholder="25000"
                 className="w-full rounded-2xl border border-white/10 bg-black/40 px-5 py-4 outline-none focus:border-primary"
               />
             </div>
+
+            <PromoFields />
 
             <div>
               <label className="mb-3 block text-sm font-bold uppercase tracking-wider text-zinc-400">

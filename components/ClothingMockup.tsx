@@ -3,11 +3,11 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 
 export const PRODUCTS = [
-  { id: "tshirt", label: "T-Shirt", emoji: "\u{1F455}" },
-  { id: "hoodie", label: "Hoodie", emoji: "\u{1F9E5}" },
-  { id: "cap", label: "Casquette", emoji: "\u{1F9E2}" },
-  { id: "tote", label: "Tote Bag", emoji: "\u{1F45C}" },
-  { id: "mug", label: "Mug", emoji: "\u2615" },
+  { id: "tshirt", label: "T-Shirt" },
+  { id: "hoodie", label: "Hoodie" },
+  { id: "cap", label: "Casquette" },
+  { id: "tote", label: "Tote Bag" },
+  { id: "mug", label: "Mug" },
 ] as const;
 
 export type ProductId = (typeof PRODUCTS)[number]["id"];
@@ -15,7 +15,7 @@ export type ProductId = (typeof PRODUCTS)[number]["id"];
 export const COLORS = [
   { name: "black", label: "Noir", hex: "#1a1a1a" },
   { name: "white", label: "Blanc", hex: "#f5f5f5" },
-  { name: "red", label: "Rouge", hex: "#D61F1F" },
+  { name: "red", label: "Rouge", hex: "#E44332" },
   { name: "navy", label: "Bleu marine", hex: "#1E3A5F" },
   { name: "blue", label: "Bleu", hex: "#2563EB" },
   { name: "green", label: "Vert", hex: "#16A34A" },
@@ -275,7 +275,7 @@ export function ClothingMockup({
         onPointerLeave={handlePointerUp}
         onWheel={handleWheel}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(214,31,31,0.04),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(228,67,50,0.05),transparent_60%)]" />
 
         <div className="relative z-10 p-6">
           <div className="mx-auto aspect-square max-w-[380px]">
@@ -357,7 +357,7 @@ export function ClothingMockup({
                     width: `${pctSize}%`,
                     height: `${pctSize}%`,
                     cursor: isActive ? "grabbing" : "grab",
-                    outline: isActive ? "2px dashed rgba(214,31,31,0.6)" : "none",
+                    outline: isActive ? "2px dashed rgba(228,67,50,0.65)" : "none",
                     outlineOffset: "4px",
                     borderRadius: "4px",
                   }}
@@ -388,7 +388,7 @@ export function ClothingMockup({
       {/* Product label */}
       <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
         <span className="inline-block h-3 w-3 rounded-full border border-white/10" style={{ background: colorName }} />
-        <span>{productDef?.emoji} {productDef?.label} {colorObj.label}</span>
+        <span>{productDef?.label} · {colorObj.label}</span>
       </div>
     </div>
   );

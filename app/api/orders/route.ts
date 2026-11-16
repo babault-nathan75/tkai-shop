@@ -6,6 +6,7 @@ import {
   buildAdminOrderNotification,
   sendAdminNotification,
 } from "@/lib/notifications";
+import { getActiveSalePrice } from "@/lib/promotions";
 
 interface OrderItemInput {
   productId: number;
@@ -102,7 +103,12 @@ export async function POST(request: Request) {
     lines.push({
       productId,
       quantity,
-      price: product.price,
+      price:
+        getActiveSalePrice(
+          product.price,
+          product.salePrice,
+          product.saleEndsAt
+        ) ?? product.price,
       size: raw.size?.toString().trim() || null,
       color: raw.color?.toString().trim() || null,
       name: product.name,
