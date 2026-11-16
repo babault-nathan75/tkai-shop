@@ -117,7 +117,7 @@ export async function Footer() {
 
         <div className="flex flex-col items-center justify-between gap-5 pt-6 sm:flex-row">
           <p className="text-center text-[10px] uppercase tracking-[.12em] text-zinc-600 sm:text-left">
-            © {currentYear} T-KAI Studio. Tous les droits réservés.
+            © {currentYear} <Link href="/admin/login" className="hover:text-white"> T-KAI Studio </Link>. Tous les droits réservés.
           </p>
           <Link
             href="/shop"
