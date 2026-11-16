@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendCustomRequestEmails } from "@/lib/mail";
 import {
@@ -67,28 +67,38 @@ export async function POST(request: Request) {
     .filter(Boolean)
     .join("\n");
 
-  // ── Fire-and-forget : emails + push notifications ──
-  Promise.allSettled([
-    sendCustomRequestEmails({
-      customerName,
-      email,
-      phone,
-      text,
-      color,
-      notes: fullNotes,
-      imageUrl,
-    }),
-    sendAdminNotification(
-      buildAdminCustomNotification({
+  after(async () => {
+    const results = await Promise.allSettled([
+      sendCustomRequestEmails({
         customerName,
         email,
         phone,
         text,
         color,
         notes: fullNotes,
-      })
-    ),
-  ]).catch(() => {});
+        imageUrl,
+      }),
+      sendAdminNotification(
+        buildAdminCustomNotification({
+          customerName,
+          email,
+          phone,
+          text,
+          color,
+          notes: fullNotes,
+        })
+      ),
+    ]);
+
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        console.error(
+          index === 0 ? "Échec de l'envoi des emails Custom Lab" : "Échec de la notification ntfy Custom Lab",
+          result.reason
+        );
+      }
+    });
+  });
 
   return NextResponse.json(
     { success: true },

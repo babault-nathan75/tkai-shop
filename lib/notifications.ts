@@ -120,6 +120,7 @@ export async function sendAdminNotification(
     headers,
     body: opts.body,
     cache: "no-store",
+    signal: AbortSignal.timeout(10_000),
   });
 
   if (!res.ok) {

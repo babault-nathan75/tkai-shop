@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendOrderEmails } from "@/lib/mail";
@@ -153,39 +153,47 @@ export async function POST(request: Request) {
     color: it.color,
   }));
 
-  // ── Fire-and-forget : emails + push notifications ──
-  // On ne bloque PAS la réponse HTTP pour ces opérations.
-  // Les erreurs sont logguées silencieusement.
-  Promise.allSettled([
-    sendOrderEmails({
-      id: order.id,
-      publicRef: order.publicRef,
-      customerName: order.customerName,
-      customerEmail: order.customerEmail,
-      phone: order.phone,
-      city: order.city,
-      address: order.address,
-      total: order.total,
-      status: order.status,
-      createdAt: order.createdAt,
-      items: emailItems,
-      trackUrl,
-      adminUrl,
-    }),
-    sendAdminNotification(
-      buildAdminOrderNotification({
+  after(async () => {
+    const results = await Promise.allSettled([
+      sendOrderEmails({
         id: order.id,
+        publicRef: order.publicRef,
         customerName: order.customerName,
         customerEmail: order.customerEmail,
         phone: order.phone,
         city: order.city,
         address: order.address,
         total: order.total,
+        status: order.status,
+        createdAt: order.createdAt,
         items: emailItems,
+        trackUrl,
         adminUrl,
-      })
-    ),
-  ]).catch(() => {});
+      }),
+      sendAdminNotification(
+        buildAdminOrderNotification({
+          id: order.id,
+          customerName: order.customerName,
+          customerEmail: order.customerEmail,
+          phone: order.phone,
+          city: order.city,
+          address: order.address,
+          total: order.total,
+          items: emailItems,
+          adminUrl,
+        })
+      ),
+    ]);
+
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        console.error(
+          index === 0 ? "Échec de l'envoi des emails de commande" : "Échec de la notification ntfy de commande",
+          result.reason
+        );
+      }
+    });
+  });
 
   return NextResponse.json(
     {
